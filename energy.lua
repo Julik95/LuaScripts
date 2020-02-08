@@ -25,6 +25,7 @@ local accumulatedEnergySecondMaxThreshold = 2.3 -- accumulated energy second upp
 -- Two steps Min Upper Bound Threshold
 local accumulatedEnergyFirstMinThreshold = 2 -- accumulated energy first lower bound threshold in kWh
 local accumulatedEnergySecondMinThreshold = 1.5 -- accumulated energy second lower bound threshold in kWh
+local userIdToSendNotification = 1 
 
 --- functions ---
 
@@ -39,12 +40,14 @@ end
 function turnOffDevices(IDs)
 	for i = 1, #IDs do
 		fibaro:call(IDs[i], "turnOff")
+		fibaro:call(userIdToSendNotification,"sendEmail", "Fibaro, device turned Off","Fibaro device: "+fibaro:getName(IDs[i])+" was turned off by scene")
 	end    
 end
 
 function turnOnDevices(IDs)
 	for i = 1, #IDs do
 		fibaro:call(IDs[i], "turnOn")
+		fibaro:call(userIdToSendNotification,"sendEmail", "Fibaro, device turned On","Fibaro device: "+fibaro:getName(IDs[i])+" was turned on by scene")
 	end
 end
 
@@ -59,28 +62,28 @@ end
 --- main code ---
 local accumulatedEnergy = tonumber(getAccumulatedEnergy(energyDevicesIds)) 
 
-if accumulatedEnergy >= accumulatedEnergyFirstMaxThreshold then  -- Turn Off first step devices when accumulated energy is greater then first Max Threshold
+if accumulatedEnergy == accumulatedEnergyFirstMaxThreshold then  -- Turn Off first step devices when accumulated energy is greater then first Max Threshold
 	if fibaro:getGlobal("isFirstStepTurnedOn") then
 		turnOffDevices(firstStepDevicesToTurnOff)
 		fibaro:setGlobal("isFirstStepTurnedOn",false)
 		resetEnergy(firstStepDevicesToTurnOff) -- Reset local energy within first step devices
 	end
 else
-	if accumulatedEnergy >= accumulatedEnergySecondMaxThreshold then -- Turn Off second step devices when accumulated energy is in between of second and first Max Thresholds
+	if accumulatedEnergy == accumulatedEnergySecondMaxThreshold then -- Turn Off second step devices when accumulated energy is in between of second and first Max Thresholds
 		if fibaro:getGlobal("isSecondStepTurnedOn") then
 			turnOffDevices(secondStepDevicesToTurnOff)
 			fibaro:setGlobal("isSecondStepTurnedOn",false)
 			resetEnergy(secondStepDevicesToTurnOff) -- Reset local energy within first step devices
 		end 
 	else 
-		if accumulatedEnergy <= accumulatedEnergyFirstMinThreshold then -- Turn On first step devices when accumulated energy is is in between of second and first Min Thresholds
+		if accumulatedEnergy == accumulatedEnergyFirstMinThreshold then -- Turn On first step devices when accumulated energy is is in between of second and first Min Thresholds
 			if not fibaro:getGlobal("isFirstStepTurnedOn") then
 				turnOnDevices(firstStepDevicesToTurnOff)
 				fibaro:setGlobal("isFirstStepTurnedOn",true)
 
 			end 
 		else
-			if accumulatedEnergy <= accumulatedEnergySecondMinThreshold then -- Turn On second step devices when accumulated energy is lower then first Min Threshold
+			if accumulatedEnergy == accumulatedEnergySecondMinThreshold then -- Turn On second step devices when accumulated energy is lower then first Min Threshold
 				if not fibaro:getGlobal("isSecondStepTurnedOn") then
 					turnOnDevices(secondStepDevicesToTurnOff)
 					fibaro:setGlobal("isSecondStepTurnedOn",true)
