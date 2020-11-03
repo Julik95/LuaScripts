@@ -122,7 +122,7 @@ function getPowerSum(IDs)
             --fibaro.debug("Power Consumption",fibaro.getName(IDs[i]).." consuma: "..tostring(currDeviceConsumption))
             if currDeviceConsumption > maxConsumption then
 				fibaro.debug("Power Consumption","E' stato rillevato il disposittivo che consuma: "..fibaro.getValue(IDs[i], "power").." Watt.")
-                doWarningNotification(IDs[i], power)
+                --doWarningNotification(IDs[i], power)
             end
         end
     return power
