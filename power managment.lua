@@ -94,7 +94,7 @@ local devicesToBeTurnedOff = {
 		time=nil,
 		icon="assets/icon/fibaro/onoff/onoff100.png",
 		state="ON",
-		minPower=2700
+		minPower=200
 	}
 }
 
